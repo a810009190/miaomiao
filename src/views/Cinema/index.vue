@@ -23,7 +23,6 @@
 import Header from '@/components/Header';
 import TabBar from '@/components/TabBar';
 import CiList from '@/components/CiList';
-import Login from '@/components/Login';
 export default {
     name : 'Cinema',
     components : {
