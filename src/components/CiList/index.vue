@@ -1,36 +1,39 @@
 <template>
 	<div class="cinema_body">
-		<!-- <ul>
-			<li>
-				<div>
-					<span>大地影院(澳东世纪店)</span>
-					<span class="q"><span class="price">22.9</span> 元起</span>
-				</div>
-				<div class="address">
-					<span>金州区大连经济技术开发区澳东世纪3层</span>
-					<span>1763.5km</span>
-				</div>
-				<div class="card">
-					<div>小吃</div>
-					<div>折扣卡</div>
-				</div>
-			</li>
-		</ul> -->
-		<ul>
-			<li v-for="item in cinemaList">
-				<div>
-					<span>{{item.rm}}</span>
-					<span class="q"><span class="price">{{item.sellPrice}}</span> 元起</span>
-				</div>
-				<div class="address">
-					<span>{{item.addr}}</span>
-					<span>{{item.distance}}</span>
-				</div>
-				<div class="card">
-					<div v-for="(num, key) in item.tag" v-if="num === 1" :class="key | classCard">{{ key | formatcard }}</div>
-				</div>
-			</li>
-		</ul>
+		<Loading v-if="isLoading" />
+		<Scroller v-else> 
+			<!-- <ul>
+				<li>
+					<div>
+						<span>大地影院(澳东世纪店)</span>
+						<span class="q"><span class="price">22.9</span> 元起</span>
+					</div>
+					<div class="address">
+						<span>金州区大连经济技术开发区澳东世纪3层</span>
+						<span>1763.5km</span>
+					</div>
+					<div class="card">
+						<div>小吃</div>
+						<div>折扣卡</div>
+					</div>
+				</li>
+			</ul> -->
+			<ul>
+				<li v-for="item in cinemaList">
+					<div>
+						<span>{{item.rm}}</span>
+						<span class="q"><span class="price">{{item.sellPrice}}</span> 元起</span>
+					</div>
+					<div class="address">
+						<span>{{item.addr}}</span>
+						<span>{{item.distance}}</span>
+					</div>
+					<div class="card">
+						<div v-for="(num, key) in item.tag" v-if="num === 1" :class="key | classCard">{{ key | formatcard }}</div>
+					</div>
+				</li>
+			</ul>
+		</Scroller>
 	</div>
 
 </template>
@@ -40,12 +43,14 @@ export default {
 	name : 'CiList',
 	data() {
 		return {
-			cinemaList : []
+			cinemaList : [],
+			isLoading : true
 		}
 	},
 	mounted(){
 		this.axios.get('/api/cinemaList').then((res) => {
 			var msg = res.data.msg;
+			this.isLoading = false;
 			if(msg === "ok"){
 				this.cinemaList = res.data.data.cinema;
 			}
