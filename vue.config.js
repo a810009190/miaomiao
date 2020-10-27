@@ -1,6 +1,7 @@
 module.exports = {
     lintOnSave: false,
-    // publicPath : '/miaomiao',
+    // 将静态资源的目录从根目录调整到miaomiao路径下
+    publicPath : '/miaomiao',
     configureWebpack: {
 
         // other webpack options to merge in ...
@@ -8,19 +9,20 @@ module.exports = {
     },
 
     // devServer Options don't belong into `configureWebpack`
-    // devServer : {
-    //     public : '192.168.1.6:8080',
+    devServer : {
+        host: '0.0.0.0',
+        public : '192.168.1.5:8080',
 
-    //     hot : true,
+        hot : true,
 
-    //     disableHostCheck : true,
-
-    //     proxy : {
-    //         '/api' : {
-    //             target : 'https://getman.cn/mock',
-    //             changeOrigin : true,
-    //         }
+        disableHostCheck : true,
+        https:false,
+        proxy : {
+            '/api' : {
+                target : 'https://getman.cn/mock',
+                changeOrigin : true,
+            }
             
-    //     }
-    // }
+        }
+    }
 }

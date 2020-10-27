@@ -23,9 +23,11 @@ export default {
         }
     },
     mounted(){
+        
         var scroll = new BScroll(this.$refs.wrapper, {
             tap : true,
-            probeType: 1
+            probeType: 1,
+            blur: true
         });
         // console.log(this)
         this.scroll = scroll
@@ -37,6 +39,7 @@ export default {
         scroll.on("touchEnd", (pos)=>{
             this.handleToTouchEnd(pos);
         })
+        
 
     },
     methods:{

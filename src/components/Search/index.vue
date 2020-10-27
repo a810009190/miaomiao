@@ -1,7 +1,7 @@
 <template>
     <div class="search_body">
         <Loading v-if="isLoading"/>
-        <Scroller v-else>
+        <Scroller v-else ref="scroll">
             <div>
                 <div class="search_input">
                     <div class="search_input_wrapper">
@@ -49,6 +49,7 @@ export default {
                 
             }
             this.moviesList = newList;
+            
             // console.log(this.moviesList);
         }
     },
@@ -77,6 +78,10 @@ export default {
     methods: {
         handleToDetail(movieId){
             this.$router.push('/movie/detail/3/' + movieId);
+        },
+        reScroll(){
+            console.log(this.$refs.scroll);
+            // this.$refs.scroll.this.scroll.refresh();
         }
     }
 }

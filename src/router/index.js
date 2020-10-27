@@ -16,7 +16,9 @@ Vue.use(VueRouter)
 
 export default new VueRouter({
   mode: 'history',
+  //  根路径
   // base: process.env.BASE_URL,
+  //miaomiao路径
   base: 'miaomiao',
   routes: [
     movieRouter,

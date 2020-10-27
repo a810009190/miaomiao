@@ -1,7 +1,7 @@
 <template>
     <div class="movie_body">
         <Loading v-if="isLoading"/>
-        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else>
+        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else ref="scroll">
             <ul>
                 <li class="pullDown" style="margin: 0; padding: 0; border: none;">{{pullDownMsg}}</li>
                 <li v-for="data in dataList" :key="data.filmId">
@@ -58,6 +58,9 @@ export default {
                     // console.log(res.data);
                     this.isLoading = false;
                     this.dataList = res.data.data.films;
+                    setTimeout(()=>{
+                        this.$refs.scroll.scroll.refresh();
+                    },500)
                 }
         })
     },
@@ -76,7 +79,7 @@ export default {
                 let id = this.$store.state.city.id
                 this.pullDownMsg = "更新完成"
                 this.axios({
-                    url: `https://m.maizuo.com/gateway?cityId=${id}&pageNum=1&pageSize=10&type=1&k=7043687`,
+                    url: `https://m.maizuo.com/gateway?cityId=${id}&pageNum=1&pageSize=10&type=2&k=2916388`,
                     headers:{
                         'X-Client-Info' : '{"a":"3000","ch":"1002","v":"5.0.4","e":"1602843160199217763057665","bc":"310100"}',
                         'X-Host' : 'mall.film-ticket.film.list'

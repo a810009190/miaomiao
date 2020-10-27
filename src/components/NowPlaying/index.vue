@@ -17,7 +17,7 @@
             
         </ul> -->
         <!-- 将函数作为值传给scroller组件，由该组件调用方法 -->
-        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else>
+        <Scroller ref="scroll" :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else >
             <ul>
                 <li class="pulldown" style="margin: 0; padding: 0; border: none;">{{pullDownMsg}}</li>
                 <li v-for="data in dataList" :key="data.filmId" >
@@ -61,6 +61,7 @@ export default {
     },
     // scroll每个组件都要引入太麻烦，也不美观，最好的办法是将scroll封装成一个组件
     activated(){
+        
         let id = this.$store.state.city.id
         this.axios({
             url: `https://m.maizuo.com/gateway?cityId=${id}&pageNum=1&pageSize=10&type=1&k=7043687`,
@@ -75,6 +76,10 @@ export default {
                 // 将获取到的信息存入dataList
                 this.isLoading = false;
                 this.dataList = res.data.data.films;
+                // 当处于v-if的时候找不到ref属性会报错，所以价格定时器
+                setTimeout(()=>{
+                    this.$refs.scroll.scroll.refresh();
+                }, 500)
                 
             }
             // 保证上一步操作执行完毕后再执行下面的代码

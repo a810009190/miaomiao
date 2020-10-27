@@ -1,7 +1,7 @@
 <template>
 	<div class="cinema_body">
         <Loading v-if="isLoading"/>
-        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else>
+        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else ref="scroll">
             <ul>
                 <li style="margin: 0; padding: 0; border: none">{{pullDownMsg}}</li>
                 <li v-for="data in cinemaList" :key="data.cinemaId">
@@ -48,6 +48,10 @@ export default {
                 this.isLoading = false;
                 this.cinemaList = res.data.data.cinemas
                 this.preCityId = id;
+                // 每次进入刷新一下refresh，主要是由于移动端小键盘会导致betterScroll滚动失效
+                setTimeout(()=>{
+                    this.$refs.scroll.scroll.refresh();
+                }, 400);
             })
         }
 
@@ -56,7 +60,7 @@ export default {
         handleToScroll(pos){
             if(pos.y > 30){
                 this.pullDownMsg = "正在更新中"
-                console.log(1111)
+                // console.log(1111)
             }
         },
         handleToTouchEnd(pos){

@@ -25,7 +25,7 @@
 
         <div class="city_index">
             <ul>
-                <li @tap="handleIndex(num)" v-for="(data,num) in cityList" :key="data.index">{{data.index}}</li>
+                <li @click="handleIndex(num)" v-for="(data,num) in cityList" :key="data.index">{{data.index}}</li>
             </ul>
         </div>
     </div>  
@@ -67,7 +67,10 @@ export default {
                 let resList = res.data.data.cities;
                 // 用modifyRes方法对城市数组进行处理，拆分出热门城市和普通城市
                 this.modifyRes(resList);
-                this.isLoading = false
+                this.isLoading = false;
+                setTimeout(()=>{
+                    this.$refs.city_list.scroll.refresh();
+                }, 500);
             })
         }
 
@@ -145,6 +148,7 @@ export default {
             let h2 = this.$refs.city_sort.getElementsByTagName("h2");
             // 引入better-scroll以后原生的方法用不了了，可以用better-scroll带的方法scrollTo
             this.$refs.city_list.toScrollTop(-h2[num].offsetTop);
+            // console.log(12);
 
 
         },
