@@ -1,109 +1,87 @@
 <template>
 	<div class="cinema_body">
-		<Loading v-if="isLoading" />
-		<Scroller v-else> 
-			<!-- <ul>
-				<li>
-					<div>
-						<span>大地影院(澳东世纪店)</span>
-						<span class="q"><span class="price">22.9</span> 元起</span>
-					</div>
-					<div class="address">
-						<span>金州区大连经济技术开发区澳东世纪3层</span>
-						<span>1763.5km</span>
-					</div>
-					<div class="card">
-						<div>小吃</div>
-						<div>折扣卡</div>
-					</div>
-				</li>
-			</ul> -->
-			<ul>
-				<li v-for="item in cinemaList">
-					<div>
-						<span>{{item.rm}}</span>
-						<span class="q"><span class="price">{{item.sellPrice}}</span> 元起</span>
-					</div>
-					<div class="address">
-						<span>{{item.addr}}</span>
-						<span>{{item.distance}}</span>
-					</div>
-					<div class="card">
-						<div v-for="(num, key) in item.tag" v-if="num === 1" :class="key | classCard">{{ key | formatcard }}</div>
-					</div>
-				</li>
-			</ul>
-		</Scroller>
+        <Loading v-if="isLoading"/>
+        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else>
+            <ul>
+                <li style="margin: 0; padding: 0; border: none">{{pullDownMsg}}</li>
+                <li v-for="data in cinemaList" :key="data.cinemaId">
+                    <div>
+                        <span>{{data.name}}</span>
+                        <span class="q"><span class="price">{{data.lowPrice / 100}}</span> 元起</span>
+                    </div>
+                    <div class="address">
+                        <span>{{data.address}}</span>
+                        <span>{{data.Distance.toFixed(2)}}km</span>
+                    </div>
+                    <div class="card">
+                        <div>小吃</div>
+                        <div>折扣卡</div>
+                    </div>
+                </li>
+            </ul>
+        </Scroller>
 	</div>
 
 </template>
 
 <script>
 export default {
-	name : 'CiList',
-	data() {
-		return {
-			cinemaList : [],
-			isLoading : true
-		}
-	},
-	mounted(){
-		this.axios.get('/api/cinemaList').then((res) => {
-			var msg = res.data.msg;
-			this.isLoading = false;
-			if(msg === "ok"){
-				this.cinemaList = res.data.data.cinema;
-			}
-		})
-	},
-	filters : {
-		formatcard(key){
-			var card = [
-				{
-					key : 'allowRefund', value : '改签'
-				},
-				{
-					key : 'endorse', value : '退票'
-				},
-				{
-					key : 'sell', value : '折扣卡'
-				},
-				{
-					key : 'snack', value : '小吃'
-				}
-			];
-			for(var i = 0;i < card.length;i++){
-				if(card[i].key === key){
-					return card[i].value;
-				}
-			}
-			return "";
+    name: "CiList",
+    data(){
+        return{
+            cinemaList: [],
+            isLoading: true,
+            pullDownMsg: '',
+            preCityId: -1
+        }
+    },
+    activated(){
+        let id = this.$store.state.city.id;
+        if(this.preCityId != id){
+            this.axios({
+                url: `https://m.maizuo.com/gateway?cityId=${id}&ticketFlag=1&k=1358505`,
+                headers: {
+                    'X-Client-Info' : '{"a":"3000","ch":"1002","v":"5.0.4","e":"1602843160199217763057665","bc":"310100"}',
+                    'X-Host' : 'mall.film-ticket.cinema.list'
+                }
+            }).then(res=>{
+                this.isLoading = false;
+                this.cinemaList = res.data.data.cinemas
+                this.preCityId = id;
+            })
+        }
 
-		},
-		classCard(key){
-			var card = [
-				{
-					key : 'allowRefund', value : 'bl'
-				},
-				{
-					key : 'endorse', value : 'bl'
-				},
-				{
-					key : 'sell', value : 'or'
-				},
-				{
-					key : 'snack', value : 'or'
-				}
-			];
-			for(var i = 0;i < card.length;i++){
-				if(card[i].key === key){
-					return card[i].value;
-				}
-			}
-			return "";
-		}
-	}
+    },
+    methods:{
+        handleToScroll(pos){
+            if(pos.y > 30){
+                this.pullDownMsg = "正在更新中"
+                console.log(1111)
+            }
+        },
+        handleToTouchEnd(pos){
+            if(pos.y > 30){
+                let id = this.$store.state.city.id;
+                this.pullDownMsg = "更新完成"
+                this.axios({
+                    url: `https://m.maizuo.com/gateway?cityId=${id}&ticketFlag=1&k=1358505`,
+                    headers:{
+                        'X-Client-Info' : '{"a":"3000","ch":"1002","v":"5.0.4","e":"1602843160199217763057665","bc":"310100"}',
+                        'X-Host' : 'mall.film-ticket.cinema.list'
+                    }
+                }).then(res=>{
+                    let msg = res.data.msg;
+                    if(msg === 'ok'){
+                        setTimeout(()=>{
+                            this.dataList = res.data.data.films;
+                            this.pullDownMsg = '';
+                        }, 1000)
+                    }
+                })
+            }
+        }
 
+    }
 }
 </script>
 

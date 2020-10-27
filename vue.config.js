@@ -1,4 +1,6 @@
 module.exports = {
+    lintOnSave: false,
+    // publicPath : '/miaomiao',
     configureWebpack: {
 
         // other webpack options to merge in ...
@@ -6,18 +8,19 @@ module.exports = {
     },
 
     // devServer Options don't belong into `configureWebpack`
-    devServer : {
-        public : '0.0.0.0:8080',
+    // devServer : {
+    //     public : '192.168.1.6:8080',
 
-        hot : true,
+    //     hot : true,
 
-        disableHostCheck : true,
-        
-        proxy : {
-            '/api' : {
-                target : 'https://getman.cn/mock',
-                changeOrigin : true,
-            }
-        }
-    }
+    //     disableHostCheck : true,
+
+    //     proxy : {
+    //         '/api' : {
+    //             target : 'https://getman.cn/mock',
+    //             changeOrigin : true,
+    //         }
+            
+    //     }
+    // }
 }

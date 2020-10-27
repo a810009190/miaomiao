@@ -4,15 +4,15 @@
             <router-link tag="li" to="/movie">
                 <i class="iconfont icon-dianying"></i>
                 <p>电影</p>
-            </router-link tag="li">
+            </router-link>
             <router-link tag="li" to="/cinema">
                 <i class="iconfont icon-dianying"></i>
                 <p>影院</p>
-            </router-link tag="li">
+            </router-link>
             <router-link tag="li" to="/mine">
                 <i class="iconfont icon-dianying"></i>
                 <p>我的</p>
-            </router-link tag="li">               
+            </router-link>               
         </ul>
     </footer>
 </template>

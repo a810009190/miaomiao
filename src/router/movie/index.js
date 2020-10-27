@@ -21,23 +21,37 @@ export default {
         {
             path : 'detail/1/:movieId',
             components : {
-                default : ()=> import('@/components/NowPlaying'),
-                detail : ()=> import('@/views/Movie/detail')
+                default : () => import('@/components/NowPlaying'),
+                detail : () => import('@/views/Movie/detail')
             },
-            props : {
-                detail : true
+            props: {
+                detail: true
             }
+
         },
         {
             path : 'detail/2/:movieId',
             components : {
-                default : ()=> import('@/components/ComingSoon'),
-                detail : ()=> import('@/views/Movie/detail')
+                default : () => import('@/components/ComingSoon'),
+                detail : () => import('@/views/Movie/detail')
             },
-            props : {
-                detail : true
+            props: {
+                detail: true
             }
+
         },
+        {
+            path : 'detail/3/:movieId',
+            components : {
+                default : () => import('@/components/Search'),
+                detail : () => import('@/views/Movie/detail')
+            },
+            props: {
+                detail: true
+            }
+
+        },
+
         {
             path : '/movie',
             redirect : '/movie/nowPlaying'

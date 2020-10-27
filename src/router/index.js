@@ -5,7 +5,10 @@ import mineRouter from './mine'
 import cinemaRouter from './cinema'
 
 Vue.use(VueRouter)
-
+// const originalReplace = VueRouter.prototype.replace;
+// VueRouter.prototype.replace = function replace(location) {
+//     return originalReplace.call(this, location).catch(err => err);
+// };
 
 
 
@@ -13,7 +16,8 @@ Vue.use(VueRouter)
 
 export default new VueRouter({
   mode: 'history',
-  base: process.env.BASE_URL,
+  // base: process.env.BASE_URL,
+  base: 'miaomiao',
   routes: [
     movieRouter,
     mineRouter,

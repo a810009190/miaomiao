@@ -1,19 +1,20 @@
 <template>
     <div class="movie_body">
-        <Loading v-if="isLoading" />
-        <Scroller v-else>
+        <Loading v-if="isLoading"/>
+        <Scroller :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd" v-else>
             <ul>
-                <li v-for="item in movieList">
-                    <div class="pic_show"><img :src="item.img | setWH('128.180')" @tap="handleToDetail(item.id)"></div>
+                <li class="pullDown" style="margin: 0; padding: 0; border: none;">{{pullDownMsg}}</li>
+                <li v-for="data in dataList" :key="data.filmId">
+                    <div class="pic_show" @tap="handleToDetail(data.filmId)">
+                        <img :src="data.poster" />
+                    </div>
                     <div class="info_list">
-                        <h2  @tap="handleToDetail(item.id)">{{item.nm}}</h2>
-                        <p><span class="person">{{item.wish}}</span> 人想看</p>
-                        <p>主演: {{item.star}}</p>
-                        <p>{{item.rt}}上映</p>
+                    <h2 @tap="handleToDetail(data.filmId)">{{data.name}}</h2>
+                    <br>
+                    <p>主演: {{data.actors | actorfilter}}</p>
+                    <p>{{data.premiereAt | datafilter}}上映</p>
                     </div>
-                    <div class="btn_pre">
-                        预售
-                    </div>
+                    <div class="btn_pre">预售</div>
                 </li>
 
             </ul>
@@ -22,27 +23,74 @@
 </template>
 
 <script>
+
 export default {
     name : 'ComingSoon',
     data() {
         return{
-            movieList : [],
-            isLoading : true
+            dataList : [],
+            pullDownMsg: '',
+            isLoading: true
         }
     },
-    mounted() {
-        this.axios.get('/api/movieComingList').then((res)=>{
-            var msg = res.data.msg;
-            this.isLoading = false;
-            if(msg === 'ok') {
-                this.movieList = res.data.data.movieList;
+    filters:{
+        // 将日期毫秒数转成日期格式
+        datafilter(data){
+            let d = new Date(data*1000);
+            return d.toISOString().slice(0, 10);
+        },
+        actorfilter(data){
+            let newList = data.map(item=>item.name);
+            return newList.join(",");
+        }
+    },
+    activated() {
+        let id = this.$store.state.city.id
+        this.axios({
+            url: `https://m.maizuo.com/gateway?cityId=${id}&pageNum=1&pageSize=10&type=2&k=2916388`,
+            headers:{
+                'X-Client-Info' : '{"a":"3000","ch":"1002","v":"5.0.4","e":"1602843160199217763057665","bc":"310100"}',
+                'X-Host' : 'mall.film-ticket.film.list'
             }
-
+        }).then(res=>{
+                let msg = res.data.msg;
+                if(msg === 'ok'){
+                    // console.log(res.data);
+                    this.isLoading = false;
+                    this.dataList = res.data.data.films;
+                }
         })
     },
     methods : {
-        handleToDetail(movieId){
-            this.$router.push('/movie/detail/2/' + movieId);
+        handleToDetail(Movieid){
+            this.$router.push('/movie/detail/2/' + Movieid);
+        },
+        handleToScroll(pos){
+            if(pos.y > 30){
+                this.pullDownMsg = "正在更新中"
+                console.log(1111)
+            }
+        },
+        handleToTouchEnd(pos){
+            if(pos.y > 30){
+                let id = this.$store.state.city.id
+                this.pullDownMsg = "更新完成"
+                this.axios({
+                    url: `https://m.maizuo.com/gateway?cityId=${id}&pageNum=1&pageSize=10&type=1&k=7043687`,
+                    headers:{
+                        'X-Client-Info' : '{"a":"3000","ch":"1002","v":"5.0.4","e":"1602843160199217763057665","bc":"310100"}',
+                        'X-Host' : 'mall.film-ticket.film.list'
+                    }
+                }).then(res=>{
+                    let msg = res.data.msg;
+                    if(msg === 'ok'){
+                        setTimeout(()=>{
+                            this.dataList = res.data.data.films;
+                            this.pullDownMsg = '';
+                        }, 1000)
+                    }
+                })
+            }
         }
     }
 }

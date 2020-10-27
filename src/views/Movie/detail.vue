@@ -1,42 +1,44 @@
 <template>
-	<div id="detailContrainer" class="slide-enter-active">
-		<Header title="影片详情">
-			<i class="iconfont icon-right" @touchstart="handleToBack"></i>
-		</Header>
-		<Loading v-if="isLoading" />
-		<div v-else id="content" class="contentDetail">
-			<div class="detail_list">
-				<div class="detail_list_bg" :style="{'background-image' : 'url(' + detailMovie.img.replace(/w\.h/,'148.208') + ')' }"></div>
-				<div class="detail_list_filter"></div>
-				<div class="detail_list_content">
-					<div class="detail_list_img">
-						<img :src="detailMovie.img | setWH('148.208')" alt="">
-					</div>
-					<div class="detail_list_info">
-						<h2>{{detailMovie.nm}}</h2>
-						<p>{{detailMovie.enm}}</p>
-						<p>{{detailMovie.sc}}</p>
-						<p>{{detailMovie.cat}}</p>
-						<p>{{detailMovie.fra}} / {{detailMovie.rt}}</p>
-						<p>{{detailMovie.pubDesc}}</p>
-					</div>
-				</div>
-			</div>
-			<div class="detail_intro">
-				<p>{{detailMovie.dra}}</p>
-			</div>
-			<div class="detail_player swiper-container" ref="detail_player">
-				<ul class="swiper-wrapper">
-					<li class="swiper-slide" v-for="item in detailMovie.photos">
-						<div>
-							<img :src="item | setWH('128.180')" alt="">
-						</div>
-						<p>{{detailMovie.star1}}</p>
-						<p>{{detailMovie.star2}}</p>
-					</li>
-				</ul>
-			</div>
-		</div>
+    <div id="detailContrainer" class="slide-enter-active">
+        <Loading v-if="isLoading"/>
+        <Scroller v-else>
+            <Header title="影片详情">
+                <i class="iconfont icon-right" @tap="handleToBack"></i>
+            </Header>
+            <div id="content" class="contentDetail">
+                <div class="detail_list">
+                    <div class="detail_list_bg" :style =" { 'background-image' : 'url(' + filmObj.poster +')'}"></div>
+                    <div class="detail_list_filter"></div>
+                    <div class="detail_list_content">
+                        <div class="detail_list_img">
+                            <img :src="filmObj.poster" alt="">
+                        </div>
+                        <div class="detail_list_info">
+                            <h2>{{filmObj.name}}</h2>
+                            <br>
+                            <p>{{filmObj.grade}}</p>
+                            <p>{{filmObj.category}}</p>
+                            <p>{{filmObj.nation}} / {{filmObj.runtime}}分钟</p>
+                            <p>{{filmObj.premiereAt | datafilter}}大陆上映</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail_intro">
+                    <p>{{filmObj.synopsis}}</p>
+                </div>
+                <div class="detail_player swiper-container" ref="detail_player">
+                    <ul class="swiper-wrapper">
+                        <li class="swiper-slide" v-for="(item, index) in filmObj.actors" :key="index">
+                            <div>
+                                <img :src="item.avatarAddress" alt="">
+                            </div>
+                            <p>{{item.name}}</p>
+                            <p>{{item.role}}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </Scroller>
 	</div>
 </template>
 
@@ -44,48 +46,65 @@
 import Header from '@/components/Header';
 
 export default {
-    name : 'detail',
-    data(){
-        return {
-            detailMovie : {},
-            isLoading : true
-        }
-    },
-    components : {
+    components:{
         Header
     },
-    props : ['movieId'],
-    methods : {
+    data(){
+        return{
+            filmObj: {},
+            isLoading: true
+        }
+    },
+    // 通过props获取url传来的参数，在路由中先开启props
+    props: ['movieId'],
+    mounted(){
+        // console.log(this.movieId);
+        // let movieId = this.$route.params.movieId;
+        this.axios({
+            url: `https://m.maizuo.com/gateway?filmId=${this.movieId}&k=2098005`,
+            headers: {
+                'X-Client-Info': '{"a":"3000","ch":"1002","v":"5.0.4","e":"160342699566052302045186","bc":"310100"}',
+                'X-Host': 'mall.film-ticket.film.info'
+            }
+        }).then((res) => {
+            // console.log(res.data.data.film);
+            this.filmObj = res.data.data.film;
+            this.isLoading = false;
+            this.$nextTick(()=>{
+                let swiper = new Swiper(this.$refs.detail_player, {
+                    slidesPerView: 'auto',
+                    freeMode: true,
+                    freeModeSticky: true
+                })
+            })
+        })
+    },
+    methods:{
         handleToBack(){
+            // 路由回退
             this.$router.back();
         }
     },
-	mounted(){
-        this.axios.get('/api/detailmovie'+ this.movieId).then((res)=>{
-            var msg = res.data.msg;
-            if( msg === 'ok' ){
-                this.isLoading = false;
-                this.detailMovie = res.data.data.detailMovie;
-				this.$nextTick(()=>{
-                    new Swiper(this.$refs.detail_player , {
-                        slidesPerView : 'auto',
-                        freeMode : true,
-                        freeModeSticky: true
-                    });
-                });
-			}
-		})
-	}
+    filters:{
+        // 日期过滤器
+        datafilter(data){
+            let d = new Date(data*1000);
+            return d.toISOString().slice(0, 10);
+        }
+    }
 }
 </script>
 
 <style scoped>
 	#detailContrainer{ position: absolute; left:0; top:0; z-index: 100; width:100%; min-height:100%; background:white;}
-	#detailContrainer.slide-enter-active{ animation:.3s slideMove;}
-	@keyframes slideMove{
-		0%{ transform : translateX(100%); }
-		100%{ transform : translateX(0); }
-	}
+	#detailContrainer.slide-enter-active{ animation: .5s slideMove; }
+    /* 过渡动画 */
+    @keyframes slideMove{
+        0%{ transform: translateX(100%); }
+        100%{ transform: translateX(0);}
+    }
+
+
 	#content.contentDetail{ display: block; margin-bottom:0;}
 	#content .detail_list{ height:200px; width:100%; position: relative; overflow: hidden;}
 	.detail_list .detail_list_bg{ width:100%; height:100%; background: 0 40%; filter: blur(20px); background-size:cover; position: absolute; left: 0; top: 0;}
